@@ -7,7 +7,7 @@ const { Server } = require('socket.io');
 app.use(express.json());
 app.use(cors(
     {
-        origin: 'http://localhost:3000',
+        origin:['http://localhost:3000','https://mudittiwari.github.io'],
     }
 )
 );
@@ -23,10 +23,12 @@ const io = new Server(server, {
 
 
 io.on('connection', (socket) => {
+    console.log("user conncted", socket.id);
+    socket.emit('connection', null);
     socket.on('fileData', ({ fileName, fileType, fileData }) => {
         console.log(fileType);
         // const writeStream = fs.createWriteStream('sample.png');
-        socket.emit('receive_file', { fileName, fileType, fileData});
+        io.emit('receive_file', { fileName, fileType, fileData});
         // fileData.forEach((chunk) => {
         //     writeStream.write(chunk);
         // });
