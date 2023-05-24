@@ -16,7 +16,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
     maxHttpBufferSize: 100e7,
     cors: {
-        origin: 'http://localhost:3000',
+        origin:['http://localhost:3000','https://mudittiwari.github.io'],
         methods: ['GET', 'POST', 'DELETE', 'PUT']
     }
 });
