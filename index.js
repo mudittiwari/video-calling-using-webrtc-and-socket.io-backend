@@ -17,7 +17,6 @@ app.use(cors(
 const server = http.createServer(app);
 
 const io = new Server(server, {
-    maxHttpBufferSize: 100e7,
     cors: {
         origin: ['http://localhost:3000', 'https://mudittiwari.github.io'],
         methods: ['GET', 'POST', 'DELETE', 'PUT']
@@ -30,18 +29,6 @@ var roomtousersmapping = {};
 io.on('connection', (socket) => {
     console.log("user conncted", socket.id);
     socket.emit('connection', null);
-    socket.on('fileData', ({ fileName, fileType, fileData,url }) => {
-        console.log(fileType);
-        // const writeStream = fs.createWriteStream('sample.png');
-        socket.in(url).emit('receive_file', { fileName, fileType, fileData });
-        // fileData.forEach((chunk) => {
-        //     writeStream.write(chunk);
-        // });
-
-        // writeStream.end(() => {
-        //     console.log('File saved:', fileName);
-        // });
-    });
 
     socket.on("create_room", (data) => {
         const { username, password } = data;
@@ -74,7 +61,44 @@ io.on('connection', (socket) => {
         socket.to(password).emit("room_data", { users: roomtousersmapping[password] });
         socket.to(password).emit("user_joined", { user: username });
     });
-
+    socket.on("send_offer", (data) => {
+        const { offer,password } = data;
+        // console.log(data);
+        // console.log("sending");
+        // console.log(password);
+        let bytes  = cryptojs.AES.decrypt(password, process.env.PASS_SEC);
+        let originalText = bytes.toString(cryptojs.enc.Utf8);
+        // console.log(originalText);
+        if(roompasswords.indexOf(originalText)===-1)
+        {
+            console.log("mudittiwari");
+            socket.emit("room_not_found", { "message": "Room Not Found" });
+            return;
+        }
+        let user2=roomtousersmapping[password][0][1];
+        console.log("offer sending to "+roomtousersmapping[password][0][0]);
+        // console.log(user2);
+        socket.to(user2).emit("offer_received", { offer: offer, user: socket.id });
+    });
+    socket.on("send_answer", (data) => {
+        const { answer,password } = data;
+        let bytes  = cryptojs.AES.decrypt(password, process.env.PASS_SEC);
+        let originalText = bytes.toString(cryptojs.enc.Utf8);
+        if(roompasswords.indexOf(originalText)===-1)
+        {
+            socket.emit("room_not_found", { "message": "Room Not Found" });
+            return;
+        }
+        let user2=roomtousersmapping[password][1][1];
+        console.log("answer sending to "+roomtousersmapping[password][1][0]);
+        socket.to(user2).emit("answer_received", { answer: answer, user: socket.id });
+        
+    });
+    
+    socket.on("send_streams", (data) => {
+        const {password}=data;
+        io.to(password).emit("send_data");
+    });
     socket.on('disconnect', () => {
         console.log("user disconnected");
         for(let i=0;i<Object.keys(roomtousersmapping).length;i++){
@@ -110,3 +134,6 @@ server.listen(5000, () => {
     console.log('listening on port 5000');
 }
 );
+
+// next work in this project
+// add screen sharing feature
