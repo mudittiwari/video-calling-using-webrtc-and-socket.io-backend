@@ -12,7 +12,7 @@ dotenv.config();
 app.use(express.json());
 app.use(cors(
   {
-    origin: ['http://localhost:3000', 'https://video-calling-using-webrtc-and-socketio.mudittiwari2.repl.co'],
+    origin: ['http://localhost:3000', 'https://video-calling-using-webrtc-and-socketio.mudittiwari2.repl.co','https://video-calling-using-webrtc-and-socket-io-mz4y-eao7wih1w.vercel.app'],
   }
 )
 );
