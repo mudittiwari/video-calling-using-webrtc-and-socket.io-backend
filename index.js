@@ -20,7 +20,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:3000', 'https://video-calling-using-webrtc-and-socketio.mudittiwari2.repl.co'],
+    origin: ['http://localhost:3000', 'https://video-calling-using-webrtc-and-socketio.mudittiwari2.repl.co','https://video-calling-using-webrtc-and-socket-io-mz4y-eao7wih1w.vercel.app''],
     methods: ['GET', 'POST', 'DELETE', 'PUT']
   }
 });
